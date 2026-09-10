@@ -1,22 +1,20 @@
 import React from 'react'
-import { styled, Stack, Text as TamaguiText } from 'tamagui'
+import { Input as TamaguiInput, Stack, Text as TamaguiText } from 'tamagui'
 import { createComponent } from '../createComponent'
 import { createInputChangeHandlers } from './inputChangeHandlers'
 
-const InputFrame = createComponent(Stack, {
+const InputFrame = createComponent(TamaguiInput as any, {
   name: 'Input',
-  tag: 'input',
-  flexDirection: 'row',
-  alignItems: 'center',
+  extends: 'Input',
   backgroundColor: '$background',
+  borderColor: '$borderColor',
   borderRadius: '$2',
   borderWidth: 1,
-  borderColor: '$borderColor',
-  paddingHorizontal: '$3',
-  height: '$10',
   color: '$color',
   fontFamily: '$body',
   fontSize: '$3',
+  paddingHorizontal: '$3',
+  height: '$10',
   outlineWidth: 0,
 
   hoverStyle: {
@@ -50,7 +48,7 @@ const InputFrame = createComponent(Stack, {
   },
 })
 
-const InputLabel = styled(TamaguiText, {
+const InputLabel = createComponent(TamaguiText, {
   name: 'InputLabel',
   fontFamily: '$body',
   fontSize: '$2',
@@ -59,7 +57,7 @@ const InputLabel = styled(TamaguiText, {
   marginBottom: '$1',
 })
 
-const InputError = styled(TamaguiText, {
+const InputError = createComponent(TamaguiText, {
   name: 'InputError',
   fontFamily: '$body',
   fontSize: '$1',

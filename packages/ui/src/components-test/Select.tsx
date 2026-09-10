@@ -1,20 +1,20 @@
 import React, { useState, useCallback } from 'react'
-import { styled, Stack, Text as TamaguiText } from 'tamagui'
+import { Select as TamaguiSelect, Stack, Text as TamaguiText } from 'tamagui'
+import { createComponent } from '../createComponent'
 
-const SelectFrame = styled(Stack, {
+const SelectFrame = createComponent(TamaguiSelect.Trigger as any, {
   name: 'Select',
-  tag: 'button',
-  role: 'listbox',
-  flexDirection: 'row',
-  alignItems: 'center',
-  justifyContent: 'space-between',
+  extends: 'Select',
   backgroundColor: '$background',
+  borderColor: '$borderColor',
   borderRadius: '$2',
   borderWidth: 1,
-  borderColor: '$borderColor',
   paddingHorizontal: '$3',
   height: '$10',
   cursor: 'pointer',
+  fontFamily: '$body',
+  fontSize: '$3',
+  color: '$color',
 
   hoverStyle: {
     borderColor: '$borderColorHover',
@@ -30,15 +30,13 @@ const SelectFrame = styled(Stack, {
   } as const,
 })
 
-const OptionItem = styled(Stack, {
+const OptionItem = createComponent(TamaguiSelect.Item as any, {
   name: 'SelectOption',
-  tag: 'button',
-  role: 'option',
+  extends: 'SelectItem',
   paddingHorizontal: '$3',
   paddingVertical: '$2',
   cursor: 'pointer',
   backgroundColor: '$background',
-
   hoverStyle: {
     backgroundColor: '$backgroundHover',
   },
@@ -64,59 +62,51 @@ export function Select({
   placeholder = 'Select...',
   disabled,
 }: SelectProps) {
-  const [open, setOpen] = useState(false)
-  const selected = options.find((o) => o.value === value)
+  const [internalValue, setInternalValue] = useState<string | undefined>(value)
+  const selectedValue = value !== undefined ? value : internalValue
+  const selected = options.find((o) => o.value === selectedValue)
 
-  const handleSelect = useCallback(
-    (optionValue: string) => {
-      onValueChange?.(optionValue)
-      setOpen(false)
+  const handleValueChange = useCallback(
+    (next: string) => {
+      setInternalValue(next)
+      onValueChange?.(next)
     },
     [onValueChange],
   )
 
   return (
-    <Stack position="relative">
-      <SelectFrame disabled={disabled} onPress={() => setOpen(!open)}>
-        <TamaguiText
-          color={selected ? '$color' : '$placeholderColor'}
-          fontFamily="$body"
-          fontSize="$3"
-        >
-          {selected?.label ?? placeholder}
-        </TamaguiText>
-        <TamaguiText color="$placeholderColor" fontSize="$2">
-          {open ? '▲' : '▼'}
-        </TamaguiText>
-      </SelectFrame>
-
-      {open && (
-        <Stack
-          position="absolute"
-          top="100%"
-          left={0}
-          right={0}
-          backgroundColor="$background"
-          borderRadius="$2"
-          borderWidth={1}
-          borderColor="$borderColor"
-          shadowColor="$shadowColor"
-          shadowRadius={8}
-          shadowOpacity={1}
-          shadowOffset={{ width: 0, height: 4 }}
-          zIndex={100}
-          marginTop="$1"
-          overflow="hidden"
-        >
-          {options.map((option) => (
-            <OptionItem key={option.value} onPress={() => handleSelect(option.value)}>
-              <TamaguiText fontFamily="$body" fontSize="$3" color="$color">
-                {option.label}
-              </TamaguiText>
-            </OptionItem>
-          ))}
-        </Stack>
-      )}
-    </Stack>
+    <TamaguiSelect value={selectedValue} onValueChange={handleValueChange} disabled={disabled}>
+      <TamaguiSelect.Trigger>
+        <SelectFrame>
+          <TamaguiText
+            color={selected ? '$color' : '$placeholderColor'}
+            fontFamily="$body"
+            fontSize="$3"
+          >
+            {selected?.label ?? placeholder}
+          </TamaguiText>
+          <TamaguiSelect.Icon>
+            <TamaguiText color="$placeholderColor" fontSize="$2">
+              ▼
+            </TamaguiText>
+          </TamaguiSelect.Icon>
+        </SelectFrame>
+      </TamaguiSelect.Trigger>
+      <TamaguiSelect.Content>
+        <TamaguiSelect.Viewport>
+          <TamaguiSelect.Group>
+            {options.map((option) => (
+              <OptionItem key={option.value} value={option.value}>
+                <TamaguiSelect.ItemText>
+                  <TamaguiText fontFamily="$body" fontSize="$3" color="$color">
+                    {option.label}
+                  </TamaguiText>
+                </TamaguiSelect.ItemText>
+              </OptionItem>
+            ))}
+          </TamaguiSelect.Group>
+        </TamaguiSelect.Viewport>
+      </TamaguiSelect.Content>
+    </TamaguiSelect>
   )
 }

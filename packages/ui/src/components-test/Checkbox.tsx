@@ -1,35 +1,19 @@
 import React, { useCallback } from 'react'
-import { Stack, Text as TamaguiText } from 'tamagui'
+import { Checkbox as TamaguiCheckbox, Stack, Text as TamaguiText } from 'tamagui'
 import { createComponent } from '../createComponent'
 
-const CheckboxFrame = createComponent(Stack, {
+const CheckboxFrame = createComponent(TamaguiCheckbox as any, {
   name: 'Checkbox',
-  tag: 'button',
-  role: 'checkbox',
-  width: 20,
-  height: 20,
-  borderRadius: '$1',
-  borderWidth: 2,
-  borderColor: '$borderColor',
+  extends: 'Checkbox',
   backgroundColor: '$backgroundTransparent',
-  alignItems: 'center',
-  justifyContent: 'center',
-  cursor: 'pointer',
-
+  borderColor: '$borderColor',
   hoverStyle: {
     borderColor: '$borderColorHover',
   },
   focusStyle: {
     borderColor: '$borderColorFocus',
   },
-
   variants: {
-    checked: {
-      true: {
-        backgroundColor: '$background',
-        borderColor: '$borderColor',
-      },
-    },
     disabled: {
       true: { opacity: 0.5, cursor: 'not-allowed' },
     },
@@ -44,18 +28,25 @@ interface CheckboxProps {
 }
 
 export function Checkbox({ checked = false, onCheckedChange, label, disabled }: CheckboxProps) {
-  const handlePress = useCallback(() => {
-    if (!disabled) onCheckedChange?.(!checked)
-  }, [checked, onCheckedChange, disabled])
+  const handleCheckedChange = useCallback(
+    (next: boolean) => {
+      if (!disabled) onCheckedChange?.(next)
+    },
+    [disabled, onCheckedChange],
+  )
 
   return (
-    <Stack flexDirection="row" alignItems="center" gap="$2" cursor={disabled ? 'not-allowed' : 'pointer'} onPress={handlePress}>
-      <CheckboxFrame checked={checked} disabled={disabled}>
-        {checked && (
-          <TamaguiText fontSize={12} color="$color" lineHeight={14}>
+    <Stack flexDirection="row" alignItems="center" gap="$2">
+      <CheckboxFrame
+        checked={checked}
+        onCheckedChange={handleCheckedChange}
+        disabled={disabled}
+      >
+        <TamaguiCheckbox.Indicator>
+          <TamaguiText fontFamily="$body" fontSize="$2" color="$color">
             ✓
           </TamaguiText>
-        )}
+        </TamaguiCheckbox.Indicator>
       </CheckboxFrame>
       {label && (
         <TamaguiText fontFamily="$body" fontSize="$3" color="$color">
